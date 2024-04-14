@@ -1,5 +1,6 @@
 {
-  "name": "frontend",
+  "name": "paytm-frontend",
+  "author": "Manan Sharma",
   "private": true,
   "version": "0.0.0",
   "type": "module",
