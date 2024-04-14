@@ -1,2 +1,2 @@
-# paytm
+# PayTM
 A basic version of PayTM
