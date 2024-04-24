@@ -6,7 +6,7 @@ const {JWT_SECRET} = require("../config");
 const router = express.Router()
 
 const signupSchema = z.object({
-    username: z.string(),
+    username: z.string().email(),
     password: z.string(),
     firstName: z.string(),
     lastName: z.string(),
@@ -22,7 +22,7 @@ router.post('/signup', async (req, res) => {
         })
     }
 
-    const existingUser = User.findOne({
+    const existingUser = await User.findOne({
         username: body.username
     })
 
@@ -32,11 +32,17 @@ router.post('/signup', async (req, res) => {
         })
     }
 
-    const dbUser = await User.create(body)
+    const user = await User.create({
+        username: body.username,
+        password: body.password,
+        firstName: body.firstName,
+        lastName: body.lastName,
+    })
+    const userId = user._id;
 
     const token = jwt.sign({
-        userId: dbUser._id
-    }, JWT_SECRET)
+        userId
+    }, JWT_SECRET);
 
     res.json({
         message: "User created successfully",
