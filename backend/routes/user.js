@@ -4,7 +4,7 @@ const {User} = require("../db")
 const jwt = require("jsonwebtoken")
 const {JWT_SECRET} = require("../config");
 const router = express.Router()
-const authMiddleware = require("../middleware")
+const {authMiddleware} = require("../middleware");
 
 const signupSchema = z.object({
     username: z.string().email(),
@@ -102,7 +102,7 @@ router.put('/', authMiddleware, async (req, res) => {
 
     await User.updateOne({_id: req.userId}, req.body)
 
-    res.send(200).json({
+    res.status(200).json({
         message: "User Updated Successfully!"
     })
 })
@@ -110,14 +110,16 @@ router.put('/', authMiddleware, async (req, res) => {
 router.get('/bulk', async (req, res) => {
     const filter = req.query.filter || ""
 
-    const users = User.find({
+    const users = await User.find({
         $or: [{
             firstName: {
-                "$regex": filter
+                "$regex": filter,
+                "$options": "i"
             }
         }, {
             lastName: {
-                "$regex": filter
+                "$regex": filter,
+                "$options": "i"
             }
         }]
     })
