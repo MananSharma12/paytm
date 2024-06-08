@@ -1,7 +1,7 @@
 import axios from "axios";
 import useSWR from "swr";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "./Button.jsx";
@@ -17,10 +17,22 @@ const fetcher = (url) =>
 
 export const Users = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
+
   const { data, error } = useSWR(
-    `http://localhost:3000/api/v1/user/bulk?filter=${searchQuery}`,
+    `http://localhost:3000/api/v1/user/bulk?filter=${debouncedSearchQuery}`,
     fetcher,
   );
+
+  useEffect(() => {
+    const debounceHandler = setInterval(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 500);
+
+    return () => {
+      clearInterval(debounceHandler);
+    };
+  }, [searchQuery]);
 
   if (error) return <div>Failed to load</div>;
   if (!data) return <div>Loading...</div>;
