@@ -3,6 +3,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 import { Button } from "./Button.jsx";
+import { useNavigate } from "react-router-dom";
 
 export const Users = () => {
   const [users, setUsers] = useState([]);
@@ -31,7 +32,6 @@ export const Users = () => {
           onChange={(e) => {
             setSearchQuery(e.target.value);
           }}
-          ā
         ></input>
       </div>
       <div>
@@ -44,6 +44,8 @@ export const Users = () => {
 };
 
 const User = ({ user }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="flex justify-between mt-6">
       <div className="flex">
@@ -60,7 +62,12 @@ const User = ({ user }) => {
       </div>
 
       <div className="flex flex-col justify-center h-full">
-        <Button text={"Send Money"} />
+        <Button
+          onClick={() => {
+            navigate(`/send?id=${user._id}&name=${user.firstName}`);
+          }}
+          text={"Send Money"}
+        />
       </div>
     </div>
   );
