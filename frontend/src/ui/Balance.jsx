@@ -1,26 +1,28 @@
 import axios from "axios";
+import useSWR from "swr";
 
-import { useEffect, useState } from "react";
+const fetcher = (url) =>
+  axios
+    .get(url, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+    .then((response) => response.data);
 
 export const Balance = () => {
-  const [balance, setBalance] = useState(0);
+  const { data, error, isLoading } = useSWR(
+    "http://localhost:3000/api/v1/account/balance",
+    fetcher,
+  );
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:3000/api/v1/account/balance", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
-      .then((response) => {
-        setBalance(response.data.balance);
-      });
-  }, []);
+  if (error) return <div>failed to load</div>;
+  if (isLoading) return <div>loading...</div>;
 
   return (
     <h1 className="mt-4 ml-auto mr-auto size">
       <span className={"font-semibold"}>Your Balance:</span>{" "}
-      <span className={"font-bold"}>₹{balance}</span>
+      <span className={"font-bold"}>₹{data.balance}</span>
     </h1>
   );
 };

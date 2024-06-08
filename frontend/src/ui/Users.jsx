@@ -1,25 +1,29 @@
 import axios from "axios";
+import useSWR from "swr";
 
-import { useEffect, useState } from "react";
-
-import { Button } from "./Button.jsx";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export const Users = () => {
-  const [users, setUsers] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+import { Button } from "./Button.jsx";
 
-  useEffect(() => {
-    axios
-      .get(`http://localhost:3000/api/v1/user/bulk?filter=${searchQuery}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
-      .then((response) => {
-        setUsers(response.data.user);
-      });
-  }, [searchQuery]);
+const fetcher = (url) =>
+  axios
+    .get(url, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+    .then((response) => response.data);
+
+export const Users = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data, error } = useSWR(
+    `http://localhost:3000/api/v1/user/bulk?filter=${searchQuery}`,
+    fetcher,
+  );
+
+  if (error) return <div>Failed to load</div>;
+  if (!data) return <div>Loading...</div>;
 
   return (
     <>
@@ -35,7 +39,7 @@ export const Users = () => {
         ></input>
       </div>
       <div>
-        {users.map((user, i) => (
+        {data.user.map((user, i) => (
           <User key={i} user={user} />
         ))}
       </div>
@@ -54,7 +58,7 @@ const User = ({ user }) => {
             {user.firstName[0]}
           </div>
         </div>
-        <div className="flex flex-col justify-center h-ful">
+        <div className="flex flex-col justify-center h-full">
           <div>
             {user.firstName} {user.lastName}
           </div>

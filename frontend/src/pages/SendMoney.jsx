@@ -13,8 +13,6 @@ export const SendMoney = () => {
   const userId = searchParams.get("id");
   const userName = searchParams.get("name");
 
-  console.log(userId);
-
   return (
     <div className="flex justify-center h-screen bg-gray-100">
       <div className="h-full flex flex-col justify-center">
